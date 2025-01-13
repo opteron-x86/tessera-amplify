@@ -1,17 +1,19 @@
+// src/amplify/data/resource.ts
 import { ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 const schema = a.schema({
-  // User model
+  // 1. User Model
   User: a
     .model({
       username: a.string().required(),
-      createdAt: a.timestamp(), // "createdAt" or "a.timestamp()" could be used if you store time in a string
-      cards: a.hasMany('PlayerCard', 'playerId'),
-      decks: a.hasMany('Deck', 'playerId'),
+      createdAt: a.timestamp(),
+      // Relationships
+      ownedCards: a.hasMany('PlayerCard', 'ownerId'), // References PlayerCard.ownerId
+      decks: a.hasMany('Deck', 'ownerId'),           // References Deck.ownerId
+    })
+    .authorization((allow) => [allow.owner()]),
 
-    }).authorization(allow => [allow.owner()]),
-    
-  // 2) A Card model referencing the master card list
+  // 2. Card Model (Master List)
   Card: a
     .model({
       name: a.string().required(),
@@ -21,49 +23,56 @@ const schema = a.schema({
       powerRight: a.integer(),
       powerBottom: a.integer(),
       powerLeft: a.integer(),
-      playerCard: a.hasMany('PlayerCard', 'cardId'),
-      Deck: a.hasMany('Deck', 'cardId'),
+      // Relationships
+      playerCards: a.hasMany('PlayerCard', 'cardId'), // References PlayerCard.cardId
+      deckCards: a.hasMany('DeckCard', 'cardId'),     // References DeckCard.cardId
+    })
+    .authorization((allow) => [
+      allow.guest().to(['read']),
+      allow.owner()
+    ]),
 
-
-      }).authorization(allow => [allow.guest()]),
-
-  // 3) A PlayerCard model (join-like model: which user owns which card, quantity, etc.)
+  // 3. PlayerCard Model (User's Owned Cards)
   PlayerCard: a
     .model({
-      playerId: a.id(),
-      player: a.belongsTo('User', 'playerId'),
-      cardId: a.id(),
-      card: a.belongsTo('Card', 'cardId'),
-
-      // Additional fields
+      ownerId: a.id().required(), // References User.id
+      cardId: a.id().required(),  // References Card.id
       quantity: a.integer(),
-      
-    }).authorization(allow => [allow.owner()]),
+      // Relationships
+      player: a.belongsTo('User', 'ownerId'), // Belongs to User via ownerId
+      card: a.belongsTo('Card', 'cardId'),   // Belongs to Card via cardId
+    })
+    .authorization((allow) => [allow.owner()]),
 
-  // 4) A Deck model referencing a User
+  // 4. Deck Model
   Deck: a
     .model({
       name: a.string().required().default('My New Deck'),
-      playerId: a.id(),
-      player: a.belongsTo('User', 'playerId'),
-      cardId: a.id(),
-      card: a.belongsTo('Card', 'cardId'),
+      ownerId: a.id().required(), // References User.id
+      // Relationships
+      player: a.belongsTo('User', 'ownerId'),          // Belongs to User via ownerId
+      deckCards: a.hasMany('DeckCard', 'deckId'),     // References DeckCard.deckId
+    })
+    .authorization((allow) => [allow.owner()]),
 
-    }).authorization(allow => [allow.owner()]),
-
-
+  // 5. DeckCard Model (Join Table for Deck and Card)
+  DeckCard: a
+    .model({
+      deckId: a.id().required(), // References Deck.id
+      cardId: a.id().required(), // References Card.id
+      quantityInDeck: a.integer(),
+      // Relationships
+      deck: a.belongsTo('Deck', 'deckId'), // Belongs to Deck via deckId
+      card: a.belongsTo('Card', 'cardId'), // Belongs to Card via cardId
+    })
+    .authorization((allow) => [allow.owner()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
   schema,
-  // Typically, you'd have something like:
-  // authorizationModes: { defaultAuthorizationMode: 'userPool', ... }
-  // And optionally add an API key mode for 'public()' usage
   authorizationModes: {
     defaultAuthorizationMode: 'userPool',
-    // Must declare an additional mode if you're using .public() or .apiKey() for read/list
-    // additionalAuthorizationModes: [{ mode: 'apiKey' }],
   },
 });

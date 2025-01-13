@@ -10,7 +10,7 @@ const Home = () => {
         <h1 className="text-4xl font-bold mb-6">Tessera Trading Card Game</h1>
         <p className="text-xl mb-8">Just another Triple Triad Clone</p>
         <button 
-          onClick={() => navigate('/game')}
+          onClick={() => navigate('/dashboard')}
           className="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded"
         >
           Enter the Realm
