@@ -20,7 +20,7 @@ const CardAdminPage = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl">Tessera Card Admin - {user?.signInDetails?.loginId}</h1>
+          <h1 className="text-2xl">Tessera Card Admin - {user?.username}</h1>
           <div className="space-x-4">
             <button 
               onClick={() => navigate('/game')}

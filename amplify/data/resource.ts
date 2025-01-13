@@ -29,7 +29,7 @@ const schema = a.schema({
     })
     .authorization((allow) => [
       allow.guest().to(['read']),
-      allow.owner()
+      allow.groups(['admin']).to(['create', 'read', 'update', 'delete']),
     ]),
 
   // 3. PlayerCard Model (User's Owned Cards)
@@ -42,7 +42,10 @@ const schema = a.schema({
       player: a.belongsTo('User', 'ownerId'), // Belongs to User via ownerId
       card: a.belongsTo('Card', 'cardId'),   // Belongs to Card via cardId
     })
-    .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [
+      allow.groups(['admin']).to(['create', 'read', 'update', 'delete']),
+      allow.owner()
+    ]),
 
   // 4. Deck Model
   Deck: a

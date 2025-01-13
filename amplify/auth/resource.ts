@@ -8,4 +8,20 @@ export const auth = defineAuth({
   loginWith: {
     email: true,
   },
+    
+  userAttributes: {
+    "custom:display_name": {
+      dataType: "String",
+      maxLen: 32,
+      minLen: 4,
+      mutable: false,
+    },
+    "custom:subscription": {
+      dataType: "Boolean",
+      mutable: true,
+    }
+
+  }
+
+
 });
