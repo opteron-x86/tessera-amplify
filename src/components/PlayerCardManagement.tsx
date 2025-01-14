@@ -43,8 +43,8 @@ const PlayerCardManagement: React.FC = () => {
     const fetchData = async () => {
       try {
         const [usersResponse, cardsResponse] = await Promise.all([
-          client.models.User.list({
-            selectionSet: ['id', 'username']
+          client.models.UserProfile.list({
+            selectionSet: ['id', 'profileOwner']
           }),
           client.models.Card.list({
             selectionSet: ['id', 'name', 'powerTop', 'powerRight', 'powerBottom', 'powerLeft']
@@ -54,7 +54,7 @@ const PlayerCardManagement: React.FC = () => {
         if (usersResponse.data) {
           setUsers(usersResponse.data.map(user => ({
             id: user.id,
-            username: user.username
+            username: user.profileOwner ?? ''
           })));
         }
 
