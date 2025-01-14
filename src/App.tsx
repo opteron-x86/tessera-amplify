@@ -1,6 +1,7 @@
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Authenticator } from '@aws-amplify/ui-react';
+import { AuthWrapper } from './components/AuthWrapper';
 import Home from "./pages/Home";
 import GamePage from "./pages/GamePage";
 import CardAdminPage from "./pages/CardAdminPage";
@@ -31,7 +32,9 @@ function App() {
           path="/dashboard" 
           element={
             <Authenticator>
-              <PlayerDashboard />
+              <AuthWrapper>
+                <PlayerDashboard />
+              </AuthWrapper>
             </Authenticator>
           } 
         />

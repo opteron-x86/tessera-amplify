@@ -10,7 +10,7 @@ export const auth = defineAuth({
   },
     
   userAttributes: {
-    preferredUsername: {
+        preferredUsername: {
       mutable: false,
       required: true
     },
