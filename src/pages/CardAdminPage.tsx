@@ -1,7 +1,8 @@
 // src/pages/CardAdminPage.tsx
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { fetchUserAttributes } from 'aws-amplify/auth';
 import CardManagement from '../components/CardManagement';
 import PlayerCardManagement from '../components/PlayerCardManagement';
 
@@ -9,6 +10,24 @@ const CardAdminPage = () => {
   const { user, signOut } = useAuthenticator();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'cards' | 'players'>('cards');
+  const [username, setUsername] = useState<string>('');
+
+  useEffect(() => {
+    const getUserAttributes = async () => {
+      if (user) {
+        try {
+          const attributes = await fetchUserAttributes();
+          const preferredUsername = attributes.preferred_username;
+          setUsername(preferredUsername || user.signInDetails?.loginId || 'Unknown User');
+        } catch (error) {
+          console.error('Error fetching user attributes:', error);
+          setUsername(user.signInDetails?.loginId || 'Unknown User');
+        }
+      }
+    };
+
+    getUserAttributes();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -20,7 +39,7 @@ const CardAdminPage = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl">Tessera Card Admin - {user?.username}</h1>
+          <h1 className="text-2xl">Tessera Card Admin - {username}</h1>
           <div className="space-x-4">
             <button 
               onClick={() => navigate('/game')}
