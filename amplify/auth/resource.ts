@@ -9,12 +9,11 @@ export const auth = defineAuth({
     email: true,
   },
     
+  
   userAttributes: {
-    "custom:display_name": {
-      dataType: "String",
-      maxLen: 32,
-      minLen: 4,
+    preferredUsername: {
       mutable: false,
+      required: true
     },
     "custom:subscription": {
       dataType: "Boolean",
